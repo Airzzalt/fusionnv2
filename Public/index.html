@@ -444,39 +444,73 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     justify-content: center;
-    z-index: 1000; /* Ensures the modal is above other elements */
+    align-items: center;
 }
 
 .modal-content {
-    background: var(--surface);
-    padding: 1.5rem;
+    background-color: var(--surface);
+    padding: 2rem;
     border-radius: 0.5rem;
-    text-align: center;
-    color: var(--text);
-    width: 90%;
     max-width: 400px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-out;
+    position: relative;
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal h2 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.modal p {
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+.help-link {
+    display: inline-block;
+    background-color: var(--primary);
+    color: var(--background);
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.help-link:hover {
+    background-color: var(--secondary);
+}
 
 .close-btn {
-    background: var(--primary);
-    color: var(--background);
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
     border: none;
-    padding: 0.5rem 1rem;
-    margin-top: 1rem;
     cursor: pointer;
-    border-radius: 0.25rem;
-    transition: background 0.3s ease;   
+    padding: 0.5rem;
+    color: var(--text);
+    transition: color 0.3s ease;
 }
 
 .close-btn:hover {
-    background: var(--secondary);
+    color: var(--primary);
 }
 
+.close-btn svg {
+    width: 24px;
+    height: 24px;
+}
 .discord-status {
     display: flex;
     align-items: center;
@@ -505,8 +539,16 @@
 <body>
     <div id="helpModal" class="modal">
         <div class="modal-content">
-            <p>Do you need further help? <a href="/join" style="color: var(--primary); text-decoration: none; font-weight: bold;">View our help page</a></p>
-            <button id="closeModal" class="close-btn">Close</button>
+            <button id="closeModal" class="close-btn" aria-label="Close modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <h2>Need Help?</h2>
+            <p>Server IP has been copied to your clipboard.</p>
+            <p>For further assistance, visit our help page.</p>
+            <a href="/join" class="help-link">View Help Page</a>
         </div>
     </div>
     
@@ -662,6 +704,11 @@
                     <div class="staff-member">
                         <img src="https://mc-heads.net/avatar/Notch/100" alt="Builder Notch">
                         <h3><span class="role role-owner">[Owner]</span> Nova</h3>
+                        <p>Server Owner</p>
+                    </div>
+                    <div class="staff-member">
+                        <img src="https://mc-heads.net/avatar/Thunder_11" alt="Builder Notch">
+                        <h3><span class="role role-owner">[Owner]</span> Thunder</h3>
                         <p>Server Owner</p>
                     </div>
                     <div class="staff-member">
@@ -845,31 +892,35 @@ setInterval(getServerStatus, 180000);
 function showModal() {
     const modal = document.getElementById('helpModal');
     modal.style.display = 'flex';
-
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 3000);
 }
 
-document.getElementById('closeModal').addEventListener('click', () => {
-    document.getElementById('helpModal').style.display = 'none';
+function hideModal() {
+    const modal = document.getElementById('helpModal');
+    modal.style.display = 'none';
+}
+
+document.getElementById('closeModal').addEventListener('click', hideModal);
+
+// Close the modal if the user clicks outside of it
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('helpModal');
+    if (event.target === modal) {
+        hideModal();
+    }
 });
 
-// Update copy button event listeners to show modal
+// Update the copy button event listeners
 copyBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(serverIP.textContent).then(() => {
-        // Show success feedback for copying IP here if needed
         showModal();
     });
 });
 
 copyBtn2.addEventListener('click', () => {
     navigator.clipboard.writeText(serverIP2.textContent).then(() => {
-        // Show success feedback for copying IP here if needed
         showModal();
     });
 });
-
 async function getDiscordStatus() {
     const widgetUrl = "https://discord.com/api/guilds/893030510073348146/widget.json";
     try {
